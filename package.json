@@ -4,7 +4,11 @@
   "private": true,
   "dependencies": {
     "@pdftron/webviewer": "^7.0.0",
+    "@progress/kendo-file-saver": "^1.1.0",
+    "@react-icons/all-files": "^4.1.0",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "downloads-folder": "^3.0.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
     "nodemailer": "^6.5.0",
@@ -14,7 +18,8 @@
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "2.1.1"
+    "react-scripts": "2.1.1",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "btoa": "^1.2.1",
