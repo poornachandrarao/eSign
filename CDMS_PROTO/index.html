@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" />
     <link href="css/main.css" rel="stylesheet" />
 	<link rel = "icon" href ="./images/3m_icom.png"  type = "image/x-icon"> 
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	
   </head>
   <body>
@@ -89,17 +90,7 @@
               </div>
             </div>
             <div class="row ">
-              <div class="input-field">
-                <div class="input-select">
-                  <select data-trigger="" name="choices-single-defaul">
-                    <option placeholder="" value="">PRIOTRITY</option>
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                  </select>
-                </div>
-              </div>
-              <div class="input-field">
+			 <div class="input-field">
                 <div class="input-select">
 				<select data-trigger="" name="choices-single-defaul">
                     <option placeholder="" value="">ISSUE TYPE</option>
@@ -109,27 +100,21 @@
                 
                 </div>
               </div>
-              <div class="input-field">
-                <div class="input-select">
-				  <select data-trigger="" name="choices-single-defaul">
-                    <option placeholder="" value="">AGE</option>
-                    <option>This Week</option>
-                    <option>This Month</option>
-                    <option>Previous Month</option>
-                  </select>
-                  
-                </div>
-              </div>
+			<div>
+              <p>	<input class=" " placeholder="REQUESTER" style="padding:11px;display:block;font-size:14px;border:none;border-bottom:2px solid #ccc;width:100%;color: #888;padding-left:2px;width:245px"  type="text"></p></div>
+			  <p><input class=" " style="padding:11px;display:block;border:none;font-size:14px;border-bottom:2px solid #ccc;width:100%;color: #888;padding-left:2px;width:245px" placeholder="PLANNED RELEASE NUMBER" type="text"></p>
+			
             </div>	
+			
 			<div id="application">			
-			<div class="row ">			
+			<!--<div class="row ">			
 			  <div class="input-field1">
 				  <input type="text" id="name" placeholder="Planned Release Nbr" class="span3">
 			  </div>				
-			  </div>
+			  </div>-->
             </div>
 			<div id="business">			
-			<div class="row ">			
+			<!--<div class="row ">			
               <div class="input-field">
                 <div class="input-select">
                   <select data-trigger="" name="choices-single-defaul">
@@ -140,18 +125,17 @@
                   </select>
                 </div>
               </div>
-             </div>
+             </div>-->
             </div>
 			<div id="All">			
-			<div class="row ">			
+			<div class="row " style="padding-bottom:20px">			
               <div class="input-field">
                 <div class="input-select">
                   <select data-trigger="" name="choices-single-defaul">
-                    <option placeholder="" value="">REQUESTER</option>
-                    <option>Jhon E</option>
-                    <option>Young Sarj</option>
-                    <option>Ulrich R</option>
-					<option>Michail Thomas</option>
+                    <option placeholder="" value="">AFFECTED AREA</option>
+                    <option>Production</option>
+                    <option>Development</option>
+                    <option>Testing</option>
                   </select>
                 </div>
               </div>
@@ -177,12 +161,17 @@
               </div>
 			  </div>
             </div>
+			<div class="row ">			
+			  
+				  <input class="" style="padding:8px;display:block;border:none;border-bottom:2px solid #ccc;width:100%;opacity: 1;font-size:14px;color: #888;padding-left:2px;width:850px" placeholder="ISSUE DESCRIPTION" type="text">
+			  			
+			</div>
 			<div class="row second">
 			</div>
             <div class="row third">
               <div class="input-field">
                 <button class="btn-search" id="myButton" onclick="doSomething()">Search</button>
-				  <a href="#" style="padding:10px;" onclick="window.location.reload(true)">Delete</a>
+				  <a href="#" style="padding:10px;" onclick="window.location.reload(true)">Reset</a>
                 
               </div>
             </div>
