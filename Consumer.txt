@@ -1,0 +1,218 @@
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+public class Consumer {
+	public static void main(String args[]) {
+		
+		var keys = "Q_YgIjc1bl_GQ-1q4SQYkH_5:EfQtdgQ6xCJvtFBcaz-I5EQuaTMKOPDqh9SGbPOf7SnlbDJO";
+		var URL = "https://chemical-management.api.ehs.com/auth/connect/token";
+		
+		// Create a trust manager that does not validate certificate chains
+		/*
+		 * TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager(){
+		 * public X509Certificate[] getAcceptedIssuers(){return null;} public void
+		 * checkClientTrusted(X509Certificate[] certs, String authType){} public void
+		 * checkServerTrusted(X509Certificate[] certs, String authType){} }};
+		 */
+		
+		try {
+			
+		     
+		      // Install the all-trusting trust manager
+		      SSLContext ctx = SSLContext.getInstance("TLS");
+		        ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
+		        SSLContext.setDefault(ctx);
+		        URL url = new URL("https://chemical-management.api.ehs.com");
+		        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		        conn.setHostnameVerifier(new HostnameVerifier() {
+		            @Override
+		            public boolean verify(String arg0, SSLSession arg1) {
+		                return true;
+		            }
+		        });
+		        System.out.println(conn.getResponseCode());
+		      
+		      
+		    } catch (NoSuchAlgorithmException e) {
+		      e.printStackTrace();
+		    } catch (KeyManagementException e) {
+		      e.printStackTrace();
+		    }catch (Exception e) {
+			      e.printStackTrace();
+			    }
+		
+		
+		loadCertificate();
+		
+
+			/*
+			 * // Install the all-trusting trust manager try { SSLContext sc =
+			 * SSLContext.getInstance("TLS"); sc.init(null, trustAllCerts, new
+			 * SecureRandom());
+			 * HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory()); } catch
+			 * (Exception e) { ; }
+			 */
+		
+			//Thread.sleep(100);
+		
+		HashMap<String, String> parameters = new HashMap<>();
+		parameters.put("grant_type", "client_credentials");
+		String form = parameters.keySet().stream()
+		        .map(key -> key + "=" + URLEncoder.encode(parameters.get(key), StandardCharsets.UTF_8))
+		        .collect(Collectors.joining("&"));
+
+		String encoding = Base64.getEncoder().encodeToString(keys.getBytes());
+		
+		
+		HttpClient client = HttpClient.newHttpClient();
+
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(URL))
+		        .headers("Content-Type", "application/x-www-form-urlencoded", "Authorization", "Basic "+encoding)
+		        .POST(BodyPublishers.ofString(form)).build();
+		try {
+		HttpResponse<?> response = client.send(request, BodyHandlers.ofString());
+		System.out.println(response.statusCode() + response.body().toString());
+		//JSONObject jsonObject = new JSONObject(response.body());
+		StringBuilder accesstoken= new StringBuilder( response.body().toString());
+		String finalAccessToken=accesstoken.substring(accesstoken.indexOf("\":\"")+3, accesstoken.indexOf("\",\""));
+		
+		System.out.println("Access Token:"+finalAccessToken);
+		useBearerToken(finalAccessToken);
+	
+		
+		}catch (Exception exe) {
+			System.out.println("error:"+exe.getMessage());
+		}
+		
+		
+	}
+	private static void useBearerToken(String bearerToken) {
+	    BufferedReader reader = null;
+	    try {
+	        URL url = new URL("https://chemical-management.api.ehs.com/v1/ebinder/ghs?pageSize=100&pageNumber=1");
+	        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+	        connection.setRequestProperty("Authorization", "Bearer " + bearerToken);
+	        connection.setDoOutput(true);
+	        connection.setRequestMethod("GET");
+	        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	        String line = null;
+	        StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+	        while ((line = reader.readLine()) != null) {
+	            out.append(line);
+	        }
+	        String response = out.toString();
+	        System.out.println(response);
+	    } catch (Exception e) {
+
+	    }
+	}
+	
+	
+	public static boolean loadCertificate() {
+		try {
+		//InputStream certIn = ClassLoader.class.getResourceAsStream("C:\\Users\\z610906\\Downloads\\medical.cer");
+		File cerfile = new File("C:\\Users\\z610906\\Downloads\\medical.cer");
+		InputStream certIn = new FileInputStream(cerfile);
+
+		final char sep = File.separatorChar;
+		File dir = new File(System.getProperty("java.home") + sep + "lib" + sep + "security");
+		File file = new File(dir, "cacerts");
+		InputStream localCertIn = new FileInputStream(file);
+		//System.out.println("localCertIn:"+file.getPath());
+		char[] password ="changeit".toCharArray();
+		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keystore.load(localCertIn, password);
+
+		System.setProperty("javax.net.ssl.trustStore",file.getPath());
+		 
+		  System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+		  //System.setProperty("javax.net.debug", "all");
+
+		  // for localhost testing only
+		  javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
+		        public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
+		        	System.out.println("hostname"+hostname);
+		          return hostname.equals("localhost");
+		        }
+
+		  });
+		
+		if (keystore.containsAlias("myAlias")) {
+		    certIn.close();
+		    localCertIn.close();
+		    return true;
+		}
+		localCertIn.close();
+		
+
+		BufferedInputStream bis = new BufferedInputStream(certIn);
+		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+		System.out.println("localCertIn closed");
+		while (bis.available() > 0) {
+		    Certificate cert = cf.generateCertificate(bis);
+		    System.out.println("inside closed");
+		    keystore.setCertificateEntry("myAlias", cert);
+		}
+
+		certIn.close();
+		System.out.println("certIn closed");
+		OutputStream out = new FileOutputStream(file);
+		keystore.store(out, password);
+		out.close();
+		}catch (Exception exe) {
+			System.out.println("Failed to load certificate"+exe.getMessage());
+		}
+		return true;
+	}
+	
+	 private static class DefaultTrustManager implements X509TrustManager {
+
+	        @Override
+	        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+	        @Override
+	        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+	        @Override
+	        public X509Certificate[] getAcceptedIssuers() {
+	            return null;
+	        }
+	    }
+	
+
+}
